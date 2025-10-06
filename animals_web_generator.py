@@ -7,6 +7,47 @@ def load_data(file_path):
         return json.load(handle)
 
 
+def serialize_animal(animal_obj):
+    """
+    Erzeugt den strukturierten HTML-String für ein einzelnes Tierobjekt
+    unter Verwendung von verschachtelten <ul>/<li>-Elementen.
+    """
+    output = '<li class="cards__item">\n'
+
+    # --- 1. Titel (Name) ---
+    if 'name' in animal_obj:
+        output += f'  <div class="card__title">{animal_obj["name"]}</div>\n'
+
+    # --- 2. Textblock-Container ---
+    card_list_items = ""
+    characteristics = animal_obj.get('characteristics')
+
+    # Diet
+    if characteristics and 'diet' in characteristics:
+        card_list_items += f'      <li><strong>Diet:</strong> {characteristics["diet"]}</li>\n'
+
+    # Location (Erster Ort)
+    if 'locations' in animal_obj and isinstance(animal_obj['locations'], list) and len(animal_obj['locations']) > 0:
+        card_list_items += f'      <li><strong>Location:</strong> {animal_obj["locations"][0]}</li>\n'
+
+    # Type
+    if characteristics and 'type' in characteristics:
+        card_list_items += f'      <li><strong>Type:</strong> {characteristics["type"]}</li>\n'
+
+    # Fügt die Liste in den div.card__text-Container ein, falls Inhalte gesammelt wurden
+    if card_list_items:
+        output += '  <div class="card__text">\n'
+        output += '    <ul>\n'
+        output += card_list_items
+        output += '    </ul>\n'
+        output += '  </div>\n'  # Schließt div.card__text ab
+
+    # Ende des Listenelements/der Karte
+    output += '</li>\n'
+
+    return output.strip()
+
+
 if __name__ == "__main__":
     # Daten laden
     try:
@@ -15,31 +56,14 @@ if __name__ == "__main__":
         print(f"Fehler beim Laden der Datei: {e}")
         exit()
 
-    # String mit Tierdaten erzeugen (nutzt <br> anstelle von \n)
+    # Den gesamten HTML-String erzeugen (vereinfachter Code)
     animals_info_string = ""
 
     if isinstance(animals_data, list):
-        for animal in animals_data:
+        for animal_obj in animals_data:
+            animals_info_string += serialize_animal(animal_obj)
 
-            # --- Beginn eines Tierblocks ---
-
-            if 'name' in animal:
-                animals_info_string += f"Name: {animal['name']}<br>"
-
-            characteristics = animal.get('characteristics')
-
-            if characteristics:
-                if 'diet' in characteristics:
-                    animals_info_string += f"Diet: {characteristics['diet']}<br>"
-
-                if 'type' in characteristics:
-                    animals_info_string += f"Type: {characteristics['type']}<br>"
-
-            if 'locations' in animal and isinstance(animal['locations'], list) and len(animal['locations']) > 0:
-                animals_info_string += f"Location: {animal['locations'][0]}<br>"
-
-        # Entfernt den letzten <br> am Ende des gesamten Strings
-        animals_info_string = animals_info_string.removesuffix('<br>')
+        animals_info_string = animals_info_string.strip()
 
     # HTML-Vorlage lesen
     try:
