@@ -205,3 +205,10 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+# Alle versteckten Dateien/Ordner ignorieren
+.*
+
+# Ausnahmen (wichtige Git-Dateien/Ordner, die getrackt werden müssen)
+!.gitignore
+!.gitattributes
